@@ -1,6 +1,6 @@
 cask "bitamp" do
-  version "0.6.0"
-  sha256 "b054a00e32dcfe133bdf65c5a711b266bde370001d69736d8cb9c1e14284121a"
+  version "0.6.1"
+  sha256 "b4a76d681571c4de126517f51a773a2f36dfb9d89c9da23232396e93b127a0b7"
 
   url "https://github.com/ryanromanov/Bitamp/releases/download/v#{version}/Bitamp-#{version}.zip"
   name "Bitamp"
