@@ -1,0 +1,39 @@
+name: Update Fallow
+
+# Points the cask at Fallow's latest release. Runs every six hours, or by hand from the
+# Actions tab right after a release.
+on:
+  schedule:
+    - cron: "47 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Update the cask
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          tag="$(gh release view -R ryanromanov/fallow-writer --json tagName -q .tagName)"
+          version="${tag#v}"
+          current="$(sed -n 's/^  version "\(.*\)"$/\1/p' Casks/fallow-writer.rb)"
+          if [ "$version" = "$current" ]; then
+            echo "Already at $current"
+            exit 0
+          fi
+          # The release publishes its checksum; check it against the zip itself.
+          gh release download "$tag" -R ryanromanov/fallow-writer -p "Fallow-$version.zip" -p "Fallow-$version.zip.sha256"
+          sha256sum -c "Fallow-$version.zip.sha256"
+          sha="$(cut -d' ' -f1 "Fallow-$version.zip.sha256")"
+          rm "Fallow-$version.zip" "Fallow-$version.zip.sha256"
+          sed -i "s/^  version \".*\"$/  version \"$version\"/; s/^  sha256 \".*\"$/  sha256 \"$sha\"/" Casks/fallow-writer.rb
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Fallow $version"
+          git push
