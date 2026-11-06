@@ -1,0 +1,39 @@
+name: Update Graupel
+
+# Points the cask at Graupel's latest release. Runs every six hours, or by hand from the
+# Actions tab right after a release.
+on:
+  schedule:
+    - cron: "32 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Update the cask
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          tag="$(gh release view -R ryanromanov/graupel --json tagName -q .tagName)"
+          version="${tag#v}"
+          current="$(sed -n 's/^  version "\(.*\)"$/\1/p' Casks/graupel.rb)"
+          if [ "$version" = "$current" ]; then
+            echo "Already at $current"
+            exit 0
+          fi
+          # The release publishes its checksum; check it against the zip itself.
+          gh release download "$tag" -R ryanromanov/graupel -p "Graupel-$version.zip" -p "Graupel-$version.zip.sha256"
+          sha256sum -c "Graupel-$version.zip.sha256"
+          sha="$(cut -d' ' -f1 "Graupel-$version.zip.sha256")"
+          rm "Graupel-$version.zip" "Graupel-$version.zip.sha256"
+          sed -i "s/^  version \".*\"$/  version \"$version\"/; s/^  sha256 \".*\"$/  sha256 \"$sha\"/" Casks/graupel.rb
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Graupel $version"
+          git push
