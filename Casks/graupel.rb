@@ -1,6 +1,6 @@
 cask "graupel" do
-  version "0.2.0"
-  sha256 "7d50fe2dcf5af9427df4397542276253a1c01d0ab939eff24203acff98bf42e1"
+  version "0.3.0"
+  sha256 "55a21f313142987431bb08d59143a7176cb84218c375521aadfe832127a3f03f"
 
   url "https://github.com/ryanromanov/graupel/releases/download/v#{version}/Graupel-#{version}.zip"
   name "Graupel"
