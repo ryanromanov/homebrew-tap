@@ -1,6 +1,6 @@
 cask "fallow-writer" do
-  version "0.3.0"
-  sha256 "ee2be489e13cb6a20094564e8b2dfdef13cc1d1baf960dbcb3ad6523ce93fa97"
+  version "1.0.0"
+  sha256 "0ea3b47a4aebfb19e7544ffe043f4bb5db83d47d0a598efd487784d2699a4424"
 
   url "https://github.com/ryanromanov/fallow-writer/releases/download/v#{version}/Fallow-#{version}.zip"
   name "Fallow"
